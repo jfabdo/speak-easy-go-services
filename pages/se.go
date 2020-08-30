@@ -1,7 +1,6 @@
 package pages
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 
@@ -19,16 +18,16 @@ type PostMessage struct {
 	writer  http.ResponseWriter //Where information is being returned to
 }
 
-func redisGet(redisdb *redis.Client, key string) *redis.StringCmd {
-	cmd := redis.NewStringCmd("get", key)
-	redisdb.Process(cmd)
-	return cmd
-}
-
-func redisClient() redisClient {
+func redisClient() redis.Client {
 	return redis.NewClient(&redis.Options{
 		Addr: os.Getenv("REDISADDRESS") + ":" + os.Getenv("REDISPORT"),
 	})
+}
+
+func postify(re *http.Request) PostMessage {
+	var PostMessage newPost
+	reader := buffio.Reader()
+	postBody := re.ReadRequest()
 }
 
 //HandleSe handles messages going to the root of speak-easy
@@ -37,7 +36,11 @@ func HandleSe(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method is not supported.", http.StatusNotFound)
 		return
 	}
-
-	v, err := redisGet(redisClient(), "placeholder_string").Result() //change placeholder string to actual struct
-	fmt.Printf("%q %s", v, err)
+	rc := redisClient()
+	isBlocked, err := rc.Get(&r.RemoteAddr) //change placeholder string to actual struct
+	if isBlocked == nil {
+		return
+	}
+	post := postify(r)
+	rc.Publish("ingress")
 }
