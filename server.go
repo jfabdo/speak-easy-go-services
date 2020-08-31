@@ -5,11 +5,11 @@ import (
 	"log"
 	"net/http"
 
-	"./pages"
+	"./services"
 )
 
 func main() {
-	http.HandleFunc("/", pages.HandleSe)
+	http.HandleFunc("/", services.HandleSe)
 	fmt.Printf("Starting server at port 8080\n")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
