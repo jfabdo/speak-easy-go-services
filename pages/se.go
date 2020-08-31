@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"encoding/json"
 	"net/http"
 	"os"
 
@@ -28,6 +29,10 @@ func postify(re *http.Request) PostMessage {
 	var PostMessage newPost
 	reader := buffio.Reader()
 	postBody := re.ReadRequest()
+	body := reader.ReadSlice(byte("}"))
+	var post []PostMessage
+	json.Unmarshal([]byte(postBody), &post)
+	return post
 }
 
 //HandleSe handles messages going to the root of speak-easy
@@ -42,5 +47,5 @@ func HandleSe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	post := postify(r)
-	rc.Publish("ingress")
+	rc.Publish("ingress", post)
 }
