@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"./services"
+	services "github.com/jfabdo/speak-easy-go-webserver/services/pages/handleSe"
 )
 
 func main() {
